@@ -1,0 +1,88 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список дел</title>
+    <style>
+        .completed {
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <input type="text" id="taskInput">
+    <button onclick="addTask()">Задачи</button>
+    <button onclick="deleteAllTasks()">Удалить все задачи</button>
+    <div>
+        <a href="#" onclick="setFilter('all')">ВСЕ</a>
+        <a href="#" onclick="setFilter('completed')">Завершенные</a>
+        <a href="#" onclick="setFilter('incomplete')">Незавершенные</a>
+    </div>
+    <select id="sortSelect" onchange="sortTasks()">
+        <option value="default">Сортировка по дефолту</option>
+        <option value="alphabetical">Сортировка по алфавиту</option>
+    </select>
+    <ul id="taskList"></ul>
+
+    <script>
+        let tasks = [];
+        let currentFilter = 'all';
+
+        function renderTasks() {
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            let filteredTasks = tasks;
+            if (currentFilter === 'completed') {
+                filteredTasks = tasks.filter(task => task.completed);
+            } else if (currentFilter === 'incomplete') {
+                filteredTasks = tasks.filter(task => !task.completed);
+            }
+            filteredTasks.forEach(task => {
+                const listItem = document.createElement('li');
+                if (task.completed) {
+                    listItem.classList.add('completed');
+                }
+                listItem.textContent = task.name;
+                listItem.onclick = () => {
+                    task.completed = !task.completed;
+                    renderTasks();
+                };
+                taskList.appendChild(listItem);
+            });
+        }
+
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskName = taskInput.value.trim();
+            if (taskName !== '') {
+                tasks.push({ name: taskName, completed: false });
+                taskInput.value = '';
+                renderTasks();
+            }
+        }
+
+        function deleteAllTasks() {
+            tasks = [];
+            renderTasks();
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            renderTasks();
+        }
+
+        function sortTasks() {
+            const sortSelect = document.getElementById('sortSelect');
+            const sortOption = sortSelect.value;
+            if (sortOption === 'alphabetical') {
+                tasks.sort((a, b) => a.name.localeCompare(b.name));
+            } else {
+                tasks.sort((a, b) => tasks.indexOf(a) - tasks.indexOf(b));
+            }
+            renderTasks();
+        }
+    </script>
+</body>
+</html>
+
